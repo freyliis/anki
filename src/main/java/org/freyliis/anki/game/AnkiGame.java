@@ -19,8 +19,14 @@ public class AnkiGame {
             gameSession.printQuestion(question.getQuestion());
             question.answerQuestion(gameSession.readAnswer());
         }
-//        sumUpGame(deck);
-//        saveState(deck);
+        sumUpGame(deck);
+    }
+
+    private void sumUpGame(Deck deck) {
+        if(deck.getQuestionsToAnswer().isEmpty()) {
+            gameSession.printCongrats();
+        }
+        gameSession.printGoodbye();
     }
 
     private void validateGame(Deck deck) {

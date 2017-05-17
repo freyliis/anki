@@ -1,4 +1,4 @@
-package org.freyliis.anki.reader.json;
+package org.freyliis.anki.writer.json;
 
 import org.freyliis.anki.model.Deck;
 import org.freyliis.anki.model.Question;
@@ -9,15 +9,15 @@ import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 
-public class JsonReaderTest {
+public class JsonWriterTest {
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -26,29 +26,34 @@ public class JsonReaderTest {
 
     @Test
     public void shouldThrowAnExceptionIfInputIsNull() {
+        JsonWriter objectUnderTest = new JsonWriter(null);
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Input cannot be null.");
-        JsonReader objectUnderTest = new JsonReader(null);
+        expectedException.expectMessage("Output cannot be null.");
+        objectUnderTest.writeDeck(null);
     }
 
     @Test
     public void shouldThrowAnExceptionIfInputIsEmpty() {
+        JsonWriter objectUnderTest = new JsonWriter("");
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Input cannot be null.");
-        JsonReader objectUnderTest = new JsonReader("");
+        expectedException.expectMessage("Output cannot be null.");
+        objectUnderTest.writeDeck(null);
     }
 
     @Test
-    public void shouldReadJsonObject() throws IOException {
+    public void shouldWriteDeck() throws IOException {
         File fileToSave = temporaryFolder.newFile();
-        JsonReader objectUnderTest = new JsonReader(fileToSave.getAbsolutePath());
         LocalDate date = LocalDate.now();
         List<Question> questions = new ArrayList<>();
         questions.add(new Question("question1", "answer1"));
-        objectUnderTest.getObjectMapper().writeValue(fileToSave, new Deck(date, questions));
+        Deck deck = new Deck(date, questions);
+        JsonWriter objectUnderTest = new JsonWriter(fileToSave.getAbsolutePath());
 
-        Optional<Deck> result = objectUnderTest.readDeck();
+        objectUnderTest.writeDeck(deck);
 
-        assertThat(result.get().getDate(), is(date));
+        List<String> elements = Files.readAllLines(fileToSave.toPath());
+        Deck result = objectUnderTest.getObjectMapper().readValue(String.join(" ", elements), Deck.class);
+        assertThat(result.getDate(), is(deck.getDate()));
     }
+
 }

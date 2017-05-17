@@ -27,4 +27,12 @@ public class GameSession {
             throw new IllegalStateException(e);
         }
     }
+
+    public void printCongrats() {
+        System.out.println("Congratulations!!");
+    }
+
+    public void printGoodbye() {
+        System.out.println("Goodbye!!");
+    }
 }

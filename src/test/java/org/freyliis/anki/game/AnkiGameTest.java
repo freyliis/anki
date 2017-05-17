@@ -16,8 +16,7 @@ import static junit.framework.TestCase.assertFalse;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class AnkiGameTest {
 
@@ -59,6 +58,8 @@ public class AnkiGameTest {
         objectUnderTest.runGame(deck);
         assertTrue(deck.getQuestionsToAnswer().contains(question));
         assertThat(question.getBox(), is(Box.ORANGE));
+        verify(gameSession,times(0)).printCongrats();
+        verify(gameSession,times(1)).printGoodbye();
     }
 
     @Test
@@ -67,6 +68,8 @@ public class AnkiGameTest {
         Deck deck = new Deck(LocalDate.now().minusDays(1), questions);
         objectUnderTest.runGame(deck);
         assertFalse(deck.getQuestionsToAnswer().contains(question));
+        verify(gameSession, times(1)).printCongrats();
+        verify(gameSession,times(1)).printGoodbye();
     }
 
     @Test
@@ -76,6 +79,8 @@ public class AnkiGameTest {
         objectUnderTest.runGame(deck);
         assertTrue(deck.getQuestionsToAnswer().contains(question));
         assertThat(question.getBox(), is(Box.RED));
+        verify(gameSession, times(0)).printCongrats();
+        verify(gameSession,times(1)).printGoodbye();
     }
 }
 
