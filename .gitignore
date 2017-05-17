@@ -1,0 +1,7 @@
+build
+test-output
+.classpath
+.project
+.gradle
+.settings
+.idea
