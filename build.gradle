@@ -2,6 +2,8 @@ group 'org.freyliis'
 version '1.0-SNAPSHOT'
 
 apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'application'
 
 sourceCompatibility = 1.8
 
@@ -14,4 +16,11 @@ dependencies {
     compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.8.8'
     testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile "org.mockito:mockito-core:2.+"
+}
+
+mainClassName = "org.freyliis.anki.game.Main"
+run {
+    if(System.getProperty("inputPath") != null && System.getProperty("outputPath") != null) {
+        args=[System.getProperty("inputPath"), System.getProperty("outputPath")]
+    }
 }

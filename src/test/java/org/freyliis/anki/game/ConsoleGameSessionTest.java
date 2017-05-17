@@ -10,9 +10,9 @@ import java.io.PrintStream;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class GameSessionTest {
+public class ConsoleGameSessionTest {
 
-    GameSession objectUnderTest = new GameSession();
+    ConsoleGameSession objectUnderTest = new ConsoleGameSession();
 
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
 
@@ -33,7 +33,7 @@ public class GameSessionTest {
         String result = outContent.toString();
         assertThat(result, is(question + System.lineSeparator()));
     }
-//TODO
+
 //    @Test
 //    public void shouldReadAnswer() {
 //        String answer = "answer";
