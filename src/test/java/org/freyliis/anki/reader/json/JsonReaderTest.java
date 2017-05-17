@@ -1,8 +1,8 @@
-package org.freyliis.anki.reader.impl;
+package org.freyliis.anki.reader.json;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import org.freyliis.anki.model.Deck;
+import org.freyliis.anki.model.Question;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -10,6 +10,8 @@ import org.junit.rules.TemporaryFolder;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -41,10 +43,10 @@ public class JsonReaderTest {
     @Test
     public void shouldReadJsonObject() throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         LocalDate date = LocalDate.now();
-        String input = objectMapper.writeValueAsString(new Deck(date));
-        System.out.println(input);
+        List<Question> questions = new ArrayList<>();
+        questions.add(new Question("question1", "answer1"));
+        String input = objectMapper.writeValueAsString(new Deck(date, questions));
         Optional<Deck> result = objectUnderTest.readDeck(input);
         assertThat(result.get().getDate(), is(date));
     }

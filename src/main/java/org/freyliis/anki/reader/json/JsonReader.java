@@ -1,4 +1,4 @@
-package org.freyliis.anki.reader.impl;
+package org.freyliis.anki.reader.json;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.freyliis.anki.model.Deck;
