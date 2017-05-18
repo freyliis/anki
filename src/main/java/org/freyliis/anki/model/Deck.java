@@ -35,7 +35,7 @@ public class Deck {
 
     @JsonIgnore
     public List<Question> getQuestionsToAnswer() {
-        return questions.stream().filter(question -> question.shouldBeAnswered()).collect(Collectors.toList());
+        return Collections.unmodifiableList(questions.stream().filter(question -> question.shouldBeAnswered()).collect(Collectors.toList()));
     }
 
     @JsonIgnore

@@ -4,9 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class QuestionTest {
 
@@ -49,4 +47,24 @@ public class QuestionTest {
         assertTrue(result);
         assertThat(questionRed.getBox(), is(Box.GREEN));
     }
+
+    @Test
+    public void shouldMoveGreenBoxQuestionToOrangeBox() {
+        questionGreen.moveToProperBox();
+        assertThat(questionGreen.getBox(), is(Box.ORANGE));
+    }
+
+    @Test
+    public void shouldMoveOrangeBoxQuestionToRedBox() {
+        questionOrange.moveToProperBox();
+        assertThat(questionOrange.getBox(), is(Box.RED));
+    }
+
+    @Test
+    public void shouldDoNothingWithQuestionInRedBox() {
+        questionRed.moveToProperBox();
+        assertThat(questionRed.getBox(), is(Box.RED));
+    }
+
+
 }

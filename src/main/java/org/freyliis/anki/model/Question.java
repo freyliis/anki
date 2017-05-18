@@ -46,6 +46,17 @@ public class Question {
         return isAnswered;
     }
 
+    public void moveToProperBox() {
+        switch (this.getBox()) {
+            case GREEN:
+                this.setBox(Box.ORANGE);
+                break;
+            case ORANGE:
+                this.setBox(Box.RED);
+                break;
+        }
+    }
+
 
     public Box getBox() {
         return box;
