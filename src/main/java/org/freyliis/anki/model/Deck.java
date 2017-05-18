@@ -34,7 +34,7 @@ public class Deck {
     }
 
     @JsonIgnore
-    public List<Question> getQuestionsToAnswerToday() {
+    public List<Question> getQuestionsToAnswer() {
         return questions.stream().filter(question -> question.shouldBeAnswered()).collect(Collectors.toList());
     }
 
@@ -45,6 +45,6 @@ public class Deck {
 
     @JsonIgnore
     public boolean areAllQuestionsProperlyAnswered() {
-        return questions.size() == questions.stream().filter(question -> question.isPropelyAnswered()).count();
+        return questions.size() == questions.stream().filter(question -> question.isProperlyAnswered()).count();
     }
 }

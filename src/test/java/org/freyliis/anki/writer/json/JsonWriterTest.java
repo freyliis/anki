@@ -1,5 +1,6 @@
 package org.freyliis.anki.writer.json;
 
+import org.freyliis.anki.game.GameException;
 import org.freyliis.anki.model.Deck;
 import org.freyliis.anki.model.Question;
 import org.junit.Rule;
@@ -25,23 +26,23 @@ public class JsonWriterTest {
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     @Test
-    public void shouldThrowAnExceptionIfInputIsNull() {
+    public void shouldThrowAnExceptionIfInputIsNull() throws GameException {
         JsonWriter objectUnderTest = new JsonWriter(null);
-        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expect(GameException.class);
         expectedException.expectMessage("Output cannot be null.");
         objectUnderTest.saveDeck(null);
     }
 
     @Test
-    public void shouldThrowAnExceptionIfInputIsEmpty() {
+    public void shouldThrowAnExceptionIfInputIsEmpty() throws GameException {
         JsonWriter objectUnderTest = new JsonWriter("");
-        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expect(GameException.class);
         expectedException.expectMessage("Output cannot be null.");
         objectUnderTest.saveDeck(null);
     }
 
     @Test
-    public void shouldWriteDeck() throws IOException {
+    public void shouldWriteDeck() throws IOException, GameException {
         File fileToSave = temporaryFolder.newFile();
         LocalDate date = LocalDate.now();
         List<Question> questions = new ArrayList<>();

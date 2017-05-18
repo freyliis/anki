@@ -32,7 +32,7 @@ public class DeckTest {
         questions.add(questionOrange);
         questions.add(questionGreen);
         Deck objectUnderTest = new Deck(LocalDate.now(), questions);
-        List<Question> result = objectUnderTest.getQuestionsToAnswerToday();
+        List<Question> result = objectUnderTest.getQuestionsToAnswer();
         assertThat(result.size(), is(1));
         assertFalse(result.contains(questionOrange));
         assertTrue(result.contains(questionRed));
@@ -60,7 +60,7 @@ public class DeckTest {
     public void shouldReturnEmptyList() {
         questions.add(questionGreen);
         Deck objectUnderTest = new Deck(LocalDate.now(), questions);
-        List<Question> result = objectUnderTest.getQuestionsToAnswerToday();
+        List<Question> result = objectUnderTest.getQuestionsToAnswer();
         assertThat(result.size(), is(0));
     }
 

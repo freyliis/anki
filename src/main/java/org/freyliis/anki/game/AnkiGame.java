@@ -22,13 +22,13 @@ public class AnkiGame {
         this.outputWriter = outputWriter;
     }
 
-    public void runGame() {
+    public void runGame() throws GameException {
         Optional<Deck> deckOptional = inputReader.readDeck();
         Deck deck = validateDeck(deckOptional);
         playGame(deck);
         sumUpGame(deck);
         endGame(deck);
-        outputWriter.saveDeck(deck);
+        outputWriter.saveDeck(new Deck(LocalDate.now(), deck.getQuestions()));
     }
 
     private void endGame(Deck deck) {
@@ -48,14 +48,18 @@ public class AnkiGame {
         }
     }
 
-    private void playGame(Deck deck) {
-        for (Question question : deck.getQuestionsToAnswerToday()) {
-            streamSession.printQuestion(question.getQuestion());
-            question.answerQuestion(streamSession.readAnswer());
+    private void playGame(Deck deck) throws GameException {
+        while (!deck.getQuestionsToAnswer().isEmpty()) {
+            for (Question question : deck.getQuestionsToAnswer()) {
+                streamSession.printQuestion(question.getQuestion());
+                if(!question.answerQuestion(streamSession.readAnswer())) {
+                    streamSession.printAnswer(question.getAnswer());
+                }
+            }
         }
     }
 
-    private void sumUpGame(Deck deck) {
+    private void sumUpGame(Deck deck) throws GameException {
         if (deck.areAllQuestionsProperlyAnswered()) {
             streamSession.printCongrats();
         }
@@ -63,16 +67,16 @@ public class AnkiGame {
         streamSession.endSession();
     }
 
-    private Deck validateDeck(Optional<Deck> deckOptional) {
+    private Deck validateDeck(Optional<Deck> deckOptional) throws GameException {
         if (!deckOptional.isPresent()) {
-            throw new IllegalArgumentException("No deck was read from input.");
+            throw new GameException("No deck was read from input.");
         }
         Deck deck = deckOptional.get();
         if (deck.getDate().isEqual(LocalDate.now())) {
-            throw new IllegalArgumentException("You already played game today.");
+            throw new GameException("You already played game today.");
         }
-        if (deck.getQuestionsToAnswerToday().isEmpty()) {
-            throw new IllegalArgumentException("There are no questions to answer in the deck.");
+        if (deck.getQuestions().isEmpty()) {
+            throw new GameException("There are no questions to answer in the deck.");
         }
         return deck;
     }

@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
@@ -41,8 +42,8 @@ public class AnkiGameTest {
     }
 
     @Test
-    public void shouldThrowAnExceptionDueToWrongDate() {
-        expectedException.expect(IllegalArgumentException.class);
+    public void shouldThrowAnExceptionDueToWrongDate() throws GameException {
+        expectedException.expect(GameException.class);
         expectedException.expectMessage("You already played game today.");
         Deck deck = new Deck(LocalDate.now(), null);
         when(jsonReader.readDeck()).thenReturn(Optional.of(deck));
@@ -50,8 +51,8 @@ public class AnkiGameTest {
     }
 
     @Test
-    public void shouldThrowAnExceptionDueToEmptyDeck() {
-        expectedException.expect(IllegalArgumentException.class);
+    public void shouldThrowAnExceptionDueToEmptyDeck() throws GameException {
+        expectedException.expect(GameException.class);
         expectedException.expectMessage("There are no questions to answer in the deck.");
         Deck deck = new Deck(LocalDate.now().minusDays(1), new ArrayList<>());
         when(jsonReader.readDeck()).thenReturn(Optional.of(deck));
@@ -59,54 +60,39 @@ public class AnkiGameTest {
     }
 
     @Test
-    public void shouldThrowAnExceptionDueToNoProperDeckInFile() {
-        expectedException.expect(IllegalArgumentException.class);
+    public void shouldThrowAnExceptionDueToNoProperDeckInFile() throws GameException {
+        expectedException.expect(GameException.class);
         expectedException.expectMessage("No deck was read from input.");
         when(jsonReader.readDeck()).thenReturn(Optional.empty());
         objectUnderTest.runGame();
     }
 
     @Test
-    public void shouldAnswerTheQuestionPartiallyAndMoveItToProperBoxInTheEndOfGame() {
-        when(streamSession.readAnswer()).thenReturn("ans");
+    public void shouldNotAnswerTheQuestionAndThenAnswerProperly() throws GameException {
+        when(streamSession.readAnswer()).thenReturn("dunno").thenReturn("answer");
         Deck deck = new Deck(LocalDate.now().minusDays(1), questions);
         when(jsonReader.readDeck()).thenReturn(Optional.of(deck));
 
         objectUnderTest.runGame();
 
-        assertTrue(deck.getQuestionsToAnswerToday().contains(question));
-        assertThat(question.getBox(), is(Box.RED));
-        verify(streamSession,times(0)).printCongrats();
-        verify(streamSession,times(1)).printGoodbye();
-        verify(streamSession,times(1)).endSession();
-    }
-
-    @Test
-    public void shouldNotAnswerTheQuestion() {
-        when(streamSession.readAnswer()).thenReturn("dunno");
-        Deck deck = new Deck(LocalDate.now().minusDays(1), questions);
-        when(jsonReader.readDeck()).thenReturn(Optional.of(deck));
-
-        objectUnderTest.runGame();
-
-        assertTrue(deck.getQuestionsToAnswerToday().contains(question));
-        assertThat(question.getBox(), is(Box.RED));
-        verify(streamSession, times(0)).printCongrats();
-        verify(streamSession,times(1)).printGoodbye();
-        verify(streamSession,times(1)).endSession();
-    }
-
-    @Test
-    public void shouldAnswerProperlyTheQuestionAndMoveItToOrangeInTheEndOfGame() {
-        when(streamSession.readAnswer()).thenReturn("answer");
-        Deck deck = new Deck(LocalDate.now().minusDays(1), questions);
-        when(jsonReader.readDeck()).thenReturn(Optional.of(deck));
-
-        objectUnderTest.runGame();
-
-        assertTrue(deck.getQuestions().contains(question));
+        assertFalse(deck.getQuestionsToAnswer().contains(question));
         assertThat(question.getBox(), is(Box.ORANGE));
         verify(streamSession, times(1)).printCongrats();
+        verify(streamSession,times(1)).printGoodbye();
+        verify(streamSession,times(1)).endSession();
+    }
+
+    @Test
+    public void shouldNotAnswerTheQuestionAndThenAnswerPartially() throws GameException {
+        when(streamSession.readAnswer()).thenReturn("dunno").thenReturn("ans");
+        Deck deck = new Deck(LocalDate.now().minusDays(1), questions);
+        when(jsonReader.readDeck()).thenReturn(Optional.of(deck));
+
+        objectUnderTest.runGame();
+
+        assertTrue(deck.getQuestionsToAnswer().contains(question));
+        assertThat(question.getBox(), is(Box.RED));
+        verify(streamSession, times(0)).printCongrats();
         verify(streamSession,times(1)).printGoodbye();
         verify(streamSession,times(1)).endSession();
     }

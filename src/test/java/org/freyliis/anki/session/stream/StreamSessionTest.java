@@ -1,5 +1,6 @@
 package org.freyliis.anki.session.stream;
 
+import org.freyliis.anki.game.GameException;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -21,40 +22,46 @@ public class StreamSessionTest {
 
 
     @Test
-    public void shouldPrintQuestion() throws IOException {
+    public void shouldPrintQuestion() throws IOException, GameException {
         objectUnderTest.printQuestion("question");
         verify(outputStream, times(1)).write(any(byte[].class), anyInt(), anyInt());
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void shouldThrowAnExceptionDuringPrintQuestion() throws IOException {
+    @Test
+    public void shouldPrintAnswer() throws IOException, GameException {
+        objectUnderTest.printAnswer("answer");
+        verify(outputStream, times(1)).write(any(byte[].class), anyInt(), anyInt());
+    }
+
+    @Test(expected = GameException.class)
+    public void shouldThrowAnExceptionDuringPrintQuestion() throws IOException, GameException {
         doThrow(IOException.class).when(outputStream).write(any(byte[].class), anyInt(), anyInt());
         objectUnderTest.printQuestion("question");
     }
 
     @Test
-    public void shouldReadAnswer() throws IOException {
+    public void shouldReadAnswer() throws IOException, GameException {
         String answer = "answer";
         objectUnderTest = new StreamSession(new ByteArrayInputStream(answer.getBytes()), outputStream);
         String result = objectUnderTest.readAnswer();
         assertThat(result, is(answer));
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void shouldThrowAnExceptionDuringReadAnswer() throws IOException {
+    @Test(expected = GameException.class)
+    public void shouldThrowAnExceptionDuringReadAnswer() throws IOException, GameException {
         doThrow(IOException.class).when(inputStream).read(any(byte[].class), anyInt(), anyInt());
         objectUnderTest.readAnswer();
     }
 
     @Test
-    public void shouldCloseStreams() throws IOException {
+    public void shouldCloseStreams() throws IOException, GameException {
         objectUnderTest.endSession();
         verify(outputStream, times(1)).close();
         verify(inputStream, times(1)).close();
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void shouldThrowAnExceptionDuringClosingStream() throws IOException {
+    @Test(expected = GameException.class)
+    public void shouldThrowAnExceptionDuringClosingStream() throws IOException, GameException {
         doThrow(IOException.class).when(inputStream).close();
         objectUnderTest.endSession();
     }

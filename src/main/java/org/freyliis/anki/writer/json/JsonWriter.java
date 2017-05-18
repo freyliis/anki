@@ -1,6 +1,7 @@
 package org.freyliis.anki.writer.json;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.freyliis.anki.game.GameException;
 import org.freyliis.anki.model.Deck;
 import org.freyliis.anki.writer.OutputWriter;
 
@@ -16,14 +17,14 @@ public class JsonWriter implements OutputWriter {
         this.output = output;
     }
 
-    public void saveDeck(Deck deck) {
+    public void saveDeck(Deck deck) throws GameException {
         if (output == null || output.isEmpty()) {
-            throw new IllegalArgumentException("Output cannot be null.");
+            throw new GameException("Output cannot be null.");
         }
         try {
             objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File(output), deck);
         } catch (IOException e) {
-            throw new IllegalStateException(e);
+            throw new GameException(e);
         }
     }
 

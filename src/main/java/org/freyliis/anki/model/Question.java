@@ -28,19 +28,22 @@ public class Question {
         return box.equals(Box.RED);
     }
     @JsonIgnore
-    public boolean isPropelyAnswered() {
+    public boolean isProperlyAnswered() {
         return box.equals(Box.GREEN);
     }
 
 
-    public void answerQuestion(String answer) {
+    public boolean answerQuestion(String answer) {
+        boolean isAnswered = false;
         if(this.answer.equals(answer)){
             this.box = Box.GREEN;
+            isAnswered = true;
         } else if (this.answer.contains(answer)) {
             this.box = Box.ORANGE;
         } else {
             this.box = Box.RED;
         }
+        return isAnswered;
     }
 
 

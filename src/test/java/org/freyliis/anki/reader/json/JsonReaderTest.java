@@ -1,5 +1,6 @@
 package org.freyliis.anki.reader.json;
 
+import org.freyliis.anki.game.GameException;
 import org.freyliis.anki.model.Deck;
 import org.freyliis.anki.model.Question;
 import org.junit.Rule;
@@ -25,13 +26,13 @@ public class JsonReaderTest {
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     @Test
-    public void shouldThrowAnExceptionIfInputIsNull() {
-        expectedException.expect(IllegalArgumentException.class);
+    public void shouldThrowAnExceptionIfInputIsNull() throws GameException {
+        expectedException.expect(GameException.class);
         JsonReader objectUnderTest = new JsonReader(null);
     }
 
     @Test
-    public void shouldReadJsonObject() throws IOException {
+    public void shouldReadJsonObject() throws IOException, GameException {
         File fileToSave = temporaryFolder.newFile();
         JsonReader objectUnderTest = new JsonReader(fileToSave.getAbsolutePath());
         LocalDate date = LocalDate.now();

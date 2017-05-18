@@ -31,19 +31,22 @@ public class QuestionTest {
 
     @Test
     public void shouldChangeBoxOfQuestionToOrangeDueToBePartiallyAnswered() {
-        questionRed.answerQuestion("answer1");
+        boolean result = questionRed.answerQuestion("answer1");
+        assertFalse(result);
         assertThat(questionRed.getBox(), is(Box.ORANGE));
     }
 
     @Test
     public void shouldChangeBoxOfQuestionToRedDueToNoAnswer() {
-        questionOrange.answerQuestion("no answer");
+        boolean result = questionOrange.answerQuestion("no answer");
+        assertFalse(result);
         assertThat(questionOrange.getBox(), is(Box.RED));
     }
 
     @Test
     public void shouldChangeBoxOfQuestionTGreenDueToProperAnswer() {
-        questionRed.answerQuestion(questionRed.getAnswer());
+        boolean result = questionRed.answerQuestion(questionRed.getAnswer());
+        assertTrue(result);
         assertThat(questionRed.getBox(), is(Box.GREEN));
     }
 }

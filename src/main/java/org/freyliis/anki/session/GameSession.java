@@ -1,15 +1,19 @@
 package org.freyliis.anki.session;
 
+import org.freyliis.anki.game.GameException;
+
 public interface GameSession {
 
-    void printQuestion(String question);
+    void printQuestion(String question) throws GameException;
 
-    String readAnswer();
+    void printAnswer(String answer) throws GameException;
 
-    void endSession();
+    String readAnswer() throws GameException;
 
-    void printCongrats();
+    void endSession() throws GameException;
 
-    void printGoodbye();
+    void printCongrats() throws GameException;
+
+    void printGoodbye() throws GameException;
 
 }

@@ -18,7 +18,7 @@ dependencies {
     testCompile "org.mockito:mockito-core:2.+"
 }
 
-mainClassName = "org.freyliis.anki.game.Main"
+mainClassName = "org.freyliis.anki.Main"
 run {
     standardInput = System.in
     if(System.getProperty("inputPath") != null && System.getProperty("outputPath") != null) {
