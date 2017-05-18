@@ -4,7 +4,7 @@ import org.freyliis.anki.model.Box;
 import org.freyliis.anki.model.Deck;
 import org.freyliis.anki.model.Question;
 import org.freyliis.anki.reader.InputReader;
-import org.freyliis.anki.session.stream.StreamSession;
+import org.freyliis.anki.session.GameSession;
 import org.freyliis.anki.writer.OutputWriter;
 
 import java.time.LocalDate;
@@ -12,23 +12,23 @@ import java.util.Optional;
 
 public class AnkiGame {
 
-    private StreamSession streamSession;
+    private GameSession gameSession;
     private InputReader inputReader;
     private OutputWriter outputWriter;
 
-    public AnkiGame(StreamSession streamSession, InputReader inputReader, OutputWriter outputWriter) {
-        this.streamSession = streamSession;
+    public AnkiGame(GameSession gameSession, InputReader inputReader, OutputWriter outputWriter) {
+        this.gameSession = gameSession;
         this.inputReader = inputReader;
         this.outputWriter = outputWriter;
     }
 
-    public void runGame() throws GameException {
+    public void runGame(LocalDate dayOfGame) throws GameException {
         Optional<Deck> deckOptional = inputReader.readDeck();
         Deck deck = validateDeck(deckOptional);
         playGame(deck);
         sumUpGame(deck);
         endGame(deck);
-        outputWriter.saveDeck(new Deck(LocalDate.now(), deck.getQuestions()));
+        outputWriter.saveDeck(new Deck(dayOfGame, deck.getQuestions()));
     }
 
     private void endGame(Deck deck) {
@@ -51,9 +51,9 @@ public class AnkiGame {
     private void playGame(Deck deck) throws GameException {
         while (!deck.getQuestionsToAnswer().isEmpty()) {
             for (Question question : deck.getQuestionsToAnswer()) {
-                streamSession.printQuestion(question.getQuestion());
-                if(!question.answerQuestion(streamSession.readAnswer())) {
-                    streamSession.printAnswer(question.getAnswer());
+                gameSession.printQuestion(question.getQuestion());
+                if(!question.answerQuestion(gameSession.readAnswer())) {
+                    gameSession.printAnswer(question.getAnswer());
                 }
             }
         }
@@ -61,10 +61,10 @@ public class AnkiGame {
 
     private void sumUpGame(Deck deck) throws GameException {
         if (deck.areAllQuestionsProperlyAnswered()) {
-            streamSession.printCongrats();
+            gameSession.printCongrats();
         }
-        streamSession.printGoodbye();
-        streamSession.endSession();
+        gameSession.printGoodbye();
+        gameSession.endSession();
     }
 
     private Deck validateDeck(Optional<Deck> deckOptional) throws GameException {

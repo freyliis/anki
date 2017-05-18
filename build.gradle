@@ -21,7 +21,7 @@ dependencies {
 mainClassName = "org.freyliis.anki.Main"
 run {
     standardInput = System.in
-    if(System.getProperty("inputPath") != null && System.getProperty("outputPath") != null) {
-        args=[System.getProperty("inputPath"), System.getProperty("outputPath")]
+    if(System.getProperty("inputFile") != null && System.getProperty("outputFile") != null) {
+        args=[System.getProperty("inputFile"), System.getProperty("outputFile")]
     }
 }
