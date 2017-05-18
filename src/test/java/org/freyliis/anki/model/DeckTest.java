@@ -27,23 +27,40 @@ public class DeckTest {
     }
 
     @Test
-    public void shouldReturnOnlyRedAndOrangeQuestions() {
+    public void shouldReturnOnlyRedQuestionsInQuestionsToAnswer() {
         questions.add(questionRed);
         questions.add(questionOrange);
         questions.add(questionGreen);
         Deck objectUnderTest = new Deck(LocalDate.now(), questions);
-        List<Question> result = objectUnderTest.getQuestionsToAnswer();
-        assertThat(result.size(), is(2));
-        assertTrue(result.contains(questionOrange));
+        List<Question> result = objectUnderTest.getQuestionsToAnswerToday();
+        assertThat(result.size(), is(1));
+        assertFalse(result.contains(questionOrange));
         assertTrue(result.contains(questionRed));
         assertFalse(result.contains(questionGreen));
+    }
+
+    @Test
+    public void shouldReturnTrueWhenAllQuestionsArePropelyAnswered() {
+        questions.add(questionGreen);
+        Deck objectUnderTest = new Deck(LocalDate.now(), questions);
+        boolean result = objectUnderTest.areAllQuestionsProperlyAnswered();
+        assertTrue(result);
+    }
+
+    @Test
+    public void shouldReturnFalseWhenAllQuestionsArePropelyAnswered() {
+        questions.add(questionOrange);
+        questions.add(questionGreen);
+        Deck objectUnderTest = new Deck(LocalDate.now(), questions);
+        boolean result = objectUnderTest.areAllQuestionsProperlyAnswered();
+        assertFalse(result);
     }
 
     @Test
     public void shouldReturnEmptyList() {
         questions.add(questionGreen);
         Deck objectUnderTest = new Deck(LocalDate.now(), questions);
-        List<Question> result = objectUnderTest.getQuestionsToAnswer();
+        List<Question> result = objectUnderTest.getQuestionsToAnswerToday();
         assertThat(result.size(), is(0));
     }
 

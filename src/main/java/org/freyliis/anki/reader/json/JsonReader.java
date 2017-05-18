@@ -2,30 +2,38 @@ package org.freyliis.anki.reader.json;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.freyliis.anki.model.Deck;
+import org.freyliis.anki.reader.InputReader;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 
-public class JsonReader {
+public class JsonReader implements InputReader {
 
     private ObjectMapper objectMapper = new ObjectMapper();
-    private String pathToFile;
+    private Path pathToFile;
 
     public ObjectMapper getObjectMapper() {
         return objectMapper;
     }
 
     public JsonReader(String pathToFile) {
-        if (pathToFile == null || pathToFile.isEmpty()) {
-            throw new IllegalArgumentException("Input cannot be null.");
+        this.pathToFile = getPathIfFileIsCorrect(pathToFile);
+    }
+
+    private Path getPathIfFileIsCorrect(String filePath) {
+        if (filePath == null || !Files.exists(Paths.get(filePath))) {
+            throw new IllegalArgumentException("File path cannot be null/empty and file has to exist. Wrong path file: " + filePath);
         }
-        this.pathToFile = pathToFile;
+        return Paths.get(filePath);
     }
 
     public Optional<Deck> readDeck() {
         try {
-            return Optional.of(objectMapper.readValue(new File(pathToFile), Deck.class));
+            System.out.println(pathToFile.toAbsolutePath());
+            return Optional.of(objectMapper.readValue(pathToFile.toFile(), Deck.class));
         } catch (IOException e) {
             e.printStackTrace();
         }

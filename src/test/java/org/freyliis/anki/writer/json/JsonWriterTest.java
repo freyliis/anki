@@ -29,7 +29,7 @@ public class JsonWriterTest {
         JsonWriter objectUnderTest = new JsonWriter(null);
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("Output cannot be null.");
-        objectUnderTest.writeDeck(null);
+        objectUnderTest.saveDeck(null);
     }
 
     @Test
@@ -37,7 +37,7 @@ public class JsonWriterTest {
         JsonWriter objectUnderTest = new JsonWriter("");
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("Output cannot be null.");
-        objectUnderTest.writeDeck(null);
+        objectUnderTest.saveDeck(null);
     }
 
     @Test
@@ -49,7 +49,7 @@ public class JsonWriterTest {
         Deck deck = new Deck(date, questions);
         JsonWriter objectUnderTest = new JsonWriter(fileToSave.getAbsolutePath());
 
-        objectUnderTest.writeDeck(deck);
+        objectUnderTest.saveDeck(deck);
 
         List<String> elements = Files.readAllLines(fileToSave.toPath());
         Deck result = objectUnderTest.getObjectMapper().readValue(String.join(" ", elements), Deck.class);

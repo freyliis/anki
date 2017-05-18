@@ -8,6 +8,7 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,7 +34,17 @@ public class Deck {
     }
 
     @JsonIgnore
-    public List<Question> getQuestionsToAnswer() {
+    public List<Question> getQuestionsToAnswerToday() {
         return questions.stream().filter(question -> question.shouldBeAnswered()).collect(Collectors.toList());
+    }
+
+    @JsonIgnore
+    public List<Question> getQuestions() {
+        return Collections.unmodifiableList(questions);
+    }
+
+    @JsonIgnore
+    public boolean areAllQuestionsProperlyAnswered() {
+        return questions.size() == questions.stream().filter(question -> question.isPropelyAnswered()).count();
     }
 }

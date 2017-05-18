@@ -1,5 +1,6 @@
 package org.freyliis.anki.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Question {
@@ -24,8 +25,13 @@ public class Question {
     }
 
     public boolean shouldBeAnswered() {
-        return !box.equals(Box.GREEN);
+        return box.equals(Box.RED);
     }
+    @JsonIgnore
+    public boolean isPropelyAnswered() {
+        return box.equals(Box.GREEN);
+    }
+
 
     public void answerQuestion(String answer) {
         if(this.answer.equals(answer)){

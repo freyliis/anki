@@ -23,8 +23,8 @@ public class QuestionTest {
     }
 
     @Test
-    public void shouldReturnTrueForRedAndOrangeAndFalseForGreenQuestionsToBeAnswered() {
-        assertTrue(questionOrange.shouldBeAnswered());
+    public void shouldReturnTrueForRedAndFalseForOrangeAndGreenQuestionsToBeAnswered() {
+        assertFalse(questionOrange.shouldBeAnswered());
         assertTrue(questionRed.shouldBeAnswered());
         assertFalse(questionGreen.shouldBeAnswered());
     }

@@ -27,15 +27,7 @@ public class JsonReaderTest {
     @Test
     public void shouldThrowAnExceptionIfInputIsNull() {
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Input cannot be null.");
         JsonReader objectUnderTest = new JsonReader(null);
-    }
-
-    @Test
-    public void shouldThrowAnExceptionIfInputIsEmpty() {
-        expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Input cannot be null.");
-        JsonReader objectUnderTest = new JsonReader("");
     }
 
     @Test

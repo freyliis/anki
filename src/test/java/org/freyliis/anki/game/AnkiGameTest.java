@@ -4,6 +4,7 @@ import org.freyliis.anki.model.Box;
 import org.freyliis.anki.model.Deck;
 import org.freyliis.anki.model.Question;
 import org.freyliis.anki.reader.json.JsonReader;
+import org.freyliis.anki.session.stream.StreamSession;
 import org.freyliis.anki.writer.json.JsonWriter;
 import org.junit.Before;
 import org.junit.Rule;
@@ -15,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static junit.framework.TestCase.assertFalse;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -25,7 +25,7 @@ public class AnkiGameTest {
 
     private AnkiGame objectUnderTest;
     private List<Question> questions;
-    private ConsoleGameSession consoleGameSession = mock(ConsoleGameSession.class);
+    private StreamSession streamSession = mock(StreamSession.class);
     JsonReader jsonReader = mock(JsonReader.class);
     JsonWriter jsonWriter = mock(JsonWriter.class);
     private Question question = new Question("question", "answer");
@@ -35,7 +35,7 @@ public class AnkiGameTest {
 
     @Before
     public void setUp() {
-        objectUnderTest = new AnkiGame(consoleGameSession, jsonReader, jsonWriter);
+        objectUnderTest = new AnkiGame(streamSession, jsonReader, jsonWriter);
         questions = new ArrayList<>();
         questions.add(question);
     }
@@ -67,47 +67,48 @@ public class AnkiGameTest {
     }
 
     @Test
-    public void shouldAnswerTheQuestionPartially() {
-        when(consoleGameSession.readAnswer()).thenReturn("ans");
+    public void shouldAnswerTheQuestionPartiallyAndMoveItToProperBoxInTheEndOfGame() {
+        when(streamSession.readAnswer()).thenReturn("ans");
         Deck deck = new Deck(LocalDate.now().minusDays(1), questions);
         when(jsonReader.readDeck()).thenReturn(Optional.of(deck));
 
         objectUnderTest.runGame();
 
-        assertTrue(deck.getQuestionsToAnswer().contains(question));
-        assertThat(question.getBox(), is(Box.ORANGE));
-        verify(consoleGameSession,times(0)).printCongrats();
-        verify(consoleGameSession,times(1)).printGoodbye();
-        verify(consoleGameSession,times(1)).endSession();
-    }
-
-    @Test
-    public void shouldAnswerTheQuestion() {
-        when(consoleGameSession.readAnswer()).thenReturn("answer");
-        Deck deck = new Deck(LocalDate.now().minusDays(1), questions);
-        when(jsonReader.readDeck()).thenReturn(Optional.of(deck));
-
-        objectUnderTest.runGame();
-
-        assertFalse(deck.getQuestionsToAnswer().contains(question));
-        verify(consoleGameSession, times(1)).printCongrats();
-        verify(consoleGameSession,times(1)).printGoodbye();
-        verify(consoleGameSession,times(1)).endSession();
+        assertTrue(deck.getQuestionsToAnswerToday().contains(question));
+        assertThat(question.getBox(), is(Box.RED));
+        verify(streamSession,times(0)).printCongrats();
+        verify(streamSession,times(1)).printGoodbye();
+        verify(streamSession,times(1)).endSession();
     }
 
     @Test
     public void shouldNotAnswerTheQuestion() {
-        when(consoleGameSession.readAnswer()).thenReturn("dunno");
+        when(streamSession.readAnswer()).thenReturn("dunno");
         Deck deck = new Deck(LocalDate.now().minusDays(1), questions);
         when(jsonReader.readDeck()).thenReturn(Optional.of(deck));
 
         objectUnderTest.runGame();
 
-        assertTrue(deck.getQuestionsToAnswer().contains(question));
+        assertTrue(deck.getQuestionsToAnswerToday().contains(question));
         assertThat(question.getBox(), is(Box.RED));
-        verify(consoleGameSession, times(0)).printCongrats();
-        verify(consoleGameSession,times(1)).printGoodbye();
-        verify(consoleGameSession,times(1)).endSession();
+        verify(streamSession, times(0)).printCongrats();
+        verify(streamSession,times(1)).printGoodbye();
+        verify(streamSession,times(1)).endSession();
+    }
+
+    @Test
+    public void shouldAnswerProperlyTheQuestionAndMoveItToOrangeInTheEndOfGame() {
+        when(streamSession.readAnswer()).thenReturn("answer");
+        Deck deck = new Deck(LocalDate.now().minusDays(1), questions);
+        when(jsonReader.readDeck()).thenReturn(Optional.of(deck));
+
+        objectUnderTest.runGame();
+
+        assertTrue(deck.getQuestions().contains(question));
+        assertThat(question.getBox(), is(Box.ORANGE));
+        verify(streamSession, times(1)).printCongrats();
+        verify(streamSession,times(1)).printGoodbye();
+        verify(streamSession,times(1)).endSession();
     }
 }
 

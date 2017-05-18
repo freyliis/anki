@@ -20,6 +20,7 @@ dependencies {
 
 mainClassName = "org.freyliis.anki.game.Main"
 run {
+    standardInput = System.in
     if(System.getProperty("inputPath") != null && System.getProperty("outputPath") != null) {
         args=[System.getProperty("inputPath"), System.getProperty("outputPath")]
     }

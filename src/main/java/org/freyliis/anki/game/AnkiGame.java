@@ -1,58 +1,79 @@
 package org.freyliis.anki.game;
 
+import org.freyliis.anki.model.Box;
 import org.freyliis.anki.model.Deck;
 import org.freyliis.anki.model.Question;
-import org.freyliis.anki.reader.json.JsonReader;
-import org.freyliis.anki.writer.json.JsonWriter;
+import org.freyliis.anki.reader.InputReader;
+import org.freyliis.anki.session.stream.StreamSession;
+import org.freyliis.anki.writer.OutputWriter;
 
 import java.time.LocalDate;
 import java.util.Optional;
 
 public class AnkiGame {
 
-    private ConsoleGameSession consoleGameSession;
-    private JsonReader jsonReader;
-    private JsonWriter jsonWriter;
+    private StreamSession streamSession;
+    private InputReader inputReader;
+    private OutputWriter outputWriter;
 
-    public AnkiGame(ConsoleGameSession consoleGameSession, JsonReader jsonReader, JsonWriter jsonWriter) {
-        this.consoleGameSession = consoleGameSession;
-        this.jsonReader = jsonReader;
-        this.jsonWriter = jsonWriter;
+    public AnkiGame(StreamSession streamSession, InputReader inputReader, OutputWriter outputWriter) {
+        this.streamSession = streamSession;
+        this.inputReader = inputReader;
+        this.outputWriter = outputWriter;
     }
 
     public void runGame() {
-        Optional<Deck> deckOptional = jsonReader.readDeck();
-        validateGame(deckOptional);
-        Deck deck = deckOptional.get();
+        Optional<Deck> deckOptional = inputReader.readDeck();
+        Deck deck = validateDeck(deckOptional);
         playGame(deck);
-        jsonWriter.writeDeck(deck);
+        sumUpGame(deck);
+        endGame(deck);
+        outputWriter.saveDeck(deck);
+    }
+
+    private void endGame(Deck deck) {
+        for (Question question : deck.getQuestions()) {
+            moveToProperBox(question);
+        }
+    }
+
+    private void moveToProperBox(Question question) {
+        switch (question.getBox()) {
+            case GREEN:
+                question.setBox(Box.ORANGE);
+                break;
+            case ORANGE:
+                question.setBox(Box.RED);
+                break;
+        }
     }
 
     private void playGame(Deck deck) {
-        for (Question question : deck.getQuestionsToAnswer()) {
-            consoleGameSession.printQuestion(question.getQuestion());
-            question.answerQuestion(consoleGameSession.readAnswer());
+        for (Question question : deck.getQuestionsToAnswerToday()) {
+            streamSession.printQuestion(question.getQuestion());
+            question.answerQuestion(streamSession.readAnswer());
         }
-        sumUpGame(deck);
     }
 
     private void sumUpGame(Deck deck) {
-        if (deck.getQuestionsToAnswer().isEmpty()) {
-            consoleGameSession.printCongrats();
+        if (deck.areAllQuestionsProperlyAnswered()) {
+            streamSession.printCongrats();
         }
-        consoleGameSession.printGoodbye();
-        consoleGameSession.endSession();
+        streamSession.printGoodbye();
+        streamSession.endSession();
     }
 
-    private void validateGame(Optional<Deck> deck) {
-        if (!deck.isPresent()) {
+    private Deck validateDeck(Optional<Deck> deckOptional) {
+        if (!deckOptional.isPresent()) {
             throw new IllegalArgumentException("No deck was read from input.");
         }
-        if (deck.get().getDate().isEqual(LocalDate.now())) {
+        Deck deck = deckOptional.get();
+        if (deck.getDate().isEqual(LocalDate.now())) {
             throw new IllegalArgumentException("You already played game today.");
         }
-        if (deck.get().getQuestionsToAnswer().isEmpty()) {
+        if (deck.getQuestionsToAnswerToday().isEmpty()) {
             throw new IllegalArgumentException("There are no questions to answer in the deck.");
         }
+        return deck;
     }
 }
